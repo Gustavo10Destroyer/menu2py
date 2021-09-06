@@ -30,21 +30,26 @@ class Menu:
     self.options = []
     
     self.hide_bg = True
+    self.clear_on_exit = True
     
     self.selection_fg_color = [0, 0, 0]
     self.selection_bg_color = [255, 255, 255]
+    
+    self.width, self.height = os.get_terminal_size()
   
   def run(self):
     index = 0
     
     for option in self.options:
+      space = " " * (self.width - len(option.text))
+      
       if index == self.selected:
-        sys.stdout.write("\r" + RenderBG(RenderFG(option.text, self.selection_fg_color), self.selection_bg_color) + "\n")
+        sys.stdout.write("\r" + RenderBG(RenderFG(option.text, self.selection_fg_color), self.selection_bg_color) + space + "\n")
       else:
         if self.hide_bg:
           sys.stdout.write("\r" + RenderFG(option.text, option.text_color) + "\n")
         else:
-          sys.stdout.write("\r" + RenderBG(RenderFG(option.text, option.text_color), option.background_color) + "\n")
+          sys.stdout.write("\r" + RenderBG(RenderFG(option.text, option.text_color), option.background_color) + space + "\n")
       
       index += 1
   
@@ -55,6 +60,9 @@ class Menu:
       key = sys.stdin.read(1)
       
       if key == "\n":
+        if self.clear_on_exit:
+          print("\033[F" * len(self.options), end="")
+        
         self.options[self.selected].callback(self, self.selected)
         break
       elif key == "w":
@@ -75,10 +83,12 @@ class Menu:
       if index == self.selected:
         sys.stdout.write("\r" + RenderBG(RenderFG(option.text, self.selection_fg_color), self.selection_bg_color) + "\n")
       else:
+        space = " " * (self.width - len(option.text))
+        
         if self.hide_bg:
-          sys.stdout.write("\r" + RenderFG(option.text, option.text_color) + "\n")
+          sys.stdout.write("\r" + RenderFG(option.text, option.text_color) + space + "\n")
         else:
-          sys.stdout.write("\r" + RenderBG(RenderFG(option.text, option.text_color), option.background_color) + "\n")
+          sys.stdout.write("\r" + RenderBG(RenderFG(option.text, option.text_color), option.background_color) + space + "\n")
       
       index += 1
   
